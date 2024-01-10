@@ -20,6 +20,7 @@
     <script>
       require(["esri/Map", "esri/views/SceneView"], (Map, SceneView) => {
         // Function to get URL parameters
+        
         function getURLParameter(name) {
           const urlParams = new URLSearchParams(window.location.search);
           return urlParams.get(name);
@@ -35,7 +36,7 @@
         // Get latitude and longitude from URL parameters (if available)
         const latitude = parseFloat(getURLParameter("latitude")) || defaultCameraPosition.y;
         const longitude = parseFloat(getURLParameter("longitude")) || defaultCameraPosition.x;
-
+        console.log("latitude", latitude);
         // Create a Map and SceneView
         const map = new Map({
           basemap: "topo-3d",
