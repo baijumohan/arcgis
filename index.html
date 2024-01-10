@@ -2,9 +2,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>Basemaps with different projections | Sample | ArcGIS Maps SDK for JavaScript 4.28</title>
-    <script src="https://js.arcgis.com/4.28/"></script>
-
+    <title>Intro to SceneView - Create a 3D map | Sample | ArcGIS Maps SDK for JavaScript 4.28</title>
     <style>
       html,
       body,
@@ -14,81 +12,58 @@
         height: 100%;
         width: 100%;
       }
-      #srDiv{
-        height: 40px;
-        padding: 10px;
-      }
     </style>
 
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.28/"></script>
+
     <script>
-      require([
-      "esri/Map",
-      "esri/views/MapView",
-      "esri/portal/Portal",
-      "esri/widgets/BasemapGallery",
-      "esri/widgets/BasemapGallery/support/PortalBasemapsSource",
-      "esri/widgets/Expand",
-      "esri/core/reactiveUtils"
-    ], function(
-      Map,
-      MapView,
-      Portal,
-      BasemapGallery,
-      PortalBasemapsSource,
-      Expand,
-      reactiveUtils
-    ) {
-
-
-      const portal = new Portal();
-
-      // source for basemaps from a portal group
-      // containing basemaps with different projections
-      const source = new PortalBasemapsSource({
-        portal,
-        query: {
-          id: "bdb9d65e0b5c480c8dcc6916e7f4e099"
+      require(["esri/Map", "esri/views/SceneView"], (Map, SceneView) => {
+        // Function to get URL parameters
+        function getURLParameter(name) {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.get(name);
         }
-      });
 
+        // Default camera position
+        const defaultCameraPosition = {
+          x: -11262192.883555487,
+          y: 2315246.351026253,
+          z: 18161244.728082635,
+        };
 
-      const map = new Map({
-        basemap: {
-          portalItem: {
-            id: "8d91bd39e873417ea21673e0fee87604" // nova basemap
-          }
-        }
-      });
+        // Get latitude and longitude from URL parameters (if available)
+        const latitude = parseFloat(getURLParameter("latitude")) || defaultCameraPosition.y;
+        const longitude = parseFloat(getURLParameter("longitude")) || defaultCameraPosition.x;
 
-      // center the view over 48 states
-      const view = new MapView({
-        container: "viewDiv",
-        map: map,
-        center: [-100, 35],
-        zoom: 2,
-        constraints: {
-          snapToZoom: false
-        }
-      });
-        
-      view.ui.add("srDiv", "top-right");
+        // Create a Map and SceneView
+        const map = new Map({
+          basemap: "topo-3d",
+          ground: "world-elevation",
+        });
 
-      const bgExpand = new Expand({
-        view,
-        content: new BasemapGallery({ source, view }),
-        expandIcon: "basemap"
+        const view = new SceneView({
+          container: "viewDiv",
+          map: map,
+          camera: {
+            position: {
+              spatialReference: {
+                latestWkid: 3857,
+                wkid: 102100,
+              },
+              x: longitude,
+              y: latitude,
+              z: defaultCameraPosition.z,
+            },
+            heading: 0,
+            tilt: 0.49,
+          },
+        });
       });
-      view.ui.add(bgExpand, "top-right");
-
-      reactiveUtils.watch(() => view.spatialReference, (spatialReference)=> {
-        document.getElementById("srDiv").innerHTML = `view.spatialReference.wkid = <b>${spatialReference.wkid}</b>`;
-      });
-    });
     </script>
   </head>
 
   <body>
     <div id="viewDiv"></div>
-    <div id="srDiv" class="esri-widget"></div>
   </body>
 </html>
